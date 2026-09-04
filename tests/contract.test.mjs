@@ -7,6 +7,7 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 test("loads the reviewed production component from the main organization", async () => {
   const html = await read("site/index.html");
   assert.match(html, /https:\/\/ores-chat\.github\.io\/components\/v1\/ores-chat-footer-link\.js/);
+  assert.match(html, /ores-chat-external-components\/pull\/2/);
   assert.equal((html.match(/<ores-chat-footer-link/g) ?? []).length, 2);
   assert.equal((html.match(/mode="dialog"/g) ?? []).length, 2);
 });
@@ -21,6 +22,11 @@ test("keeps marketing contexts independent", async () => {
     assert.match(worker, new RegExp(`"${context}"`));
   }
   assert.match(html, /ores-chat-test\.github\.io\/marketing-sites-consumer-e2e\/mock-api\//);
+  assert.match(worker, /\/v1\/public\/chat/);
+  assert.doesNotMatch(worker, /\/v1\/public\/messages/);
+  assert.match(worker, /context_refs/);
+  assert.match(worker, /request_id/);
+  assert.match(worker, /answer:/);
 });
 
 test("labels deterministic responses and contains no credential material", async () => {
